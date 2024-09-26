@@ -1,3 +1,4 @@
+import time
 import argparse
 import os
 import pathlib
@@ -152,7 +153,7 @@ def main():
         partition_output_dir.mkdir(parents=True, exist_ok=True)
 
     bpp_sum = 0.
-    
+    start = time.time()
     with open(os.path.join(opt.output_dir, 'bpp.txt'),'a') as f:
         for i, x in enumerate(tqdm(dataloader)):
             if torch.cuda.is_available():
@@ -171,6 +172,9 @@ def main():
             f.write(f'image: {i} \t bpp: {bpp}\n')
         f.write(f'Bpp Average: {bpp_sum/len(dataset)}')
         print(f'Bpp Average: {bpp_sum/len(dataset)}')
+    end = time.time()
+    print("Total inference time: ", end - start)
+    print("Average inference time: ", (end - start) / len(dataset))
     f.close()
 
 
