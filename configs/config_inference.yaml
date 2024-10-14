@@ -11,7 +11,7 @@ model:
     entropy_patch_size: 
     - 8
     - 16
-    ckpt_path: '/kaggle/input/cgic/pytorch/default/1/step164999 (3).ckpt'
+    ckpt_path: '/kaggle/input/m/onkur7/cgic/pytorch/default/1/step164999 (3).ckpt''
     ddconfig:
       double_z: false
       z_channels: 4
