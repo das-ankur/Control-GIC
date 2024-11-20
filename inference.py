@@ -156,24 +156,25 @@ def main():
     total_time = 0
     with open(os.path.join(opt.output_dir, 'bpp.txt'),'a') as f:
         for i, x in enumerate(tqdm(dataloader)):
-            start = time.time()
-            write_time = 0
-            if torch.cuda.is_available():
-                x = x.cuda()
-            
-            with torch.no_grad():
-                if opt.write_output_image:
-                    x_rec, bpp, partition_map = model.compress(x, opt.output_dir, h_string, h_mask, save_img=True)
-                    x_rec = x_rec.clamp(0, 1)
-                    write_time_start = time.time()
-                    write_images(x_rec, rec_output_dir, i, opt.batch_size, opt.images_range[0], bpp=bpp)
-                    write_images(partition_map, partition_output_dir, i, opt.batch_size, opt.images_range[0], None)
-                    write_time_end = time.time()
-                    write_time += (write_time_end - write_time_start)
-                else:
-                    bpp = model.compress(x, opt.output_dir, h_string, h_mask, save_img=False)
-            end = time.time()
-
+            try:
+                start = time.time()
+                write_time = 0
+                if torch.cuda.is_available():
+                    x = x.cuda()   
+                with torch.no_grad():
+                    if opt.write_output_image:
+                        x_rec, bpp, partition_map = model.compress(x, opt.output_dir, h_string, h_mask, save_img=True)
+                        x_rec = x_rec.clamp(0, 1)
+                        write_time_start = time.time()
+                        write_images(x_rec, rec_output_dir, i, opt.batch_size, opt.images_range[0], bpp=bpp)
+                        write_images(partition_map, partition_output_dir, i, opt.batch_size, opt.images_range[0], None)
+                        write_time_end = time.time()
+                        write_time += (write_time_end - write_time_start)
+                    else:
+                        bpp = model.compress(x, opt.output_dir, h_string, h_mask, save_img=False)
+                end = time.time()
+            except Exception as err:
+                print(err)
             total_time += (end - start) - write_time
             bpp_sum += bpp
             f.write(f'image: {i} \t bpp: {bpp}\n')
