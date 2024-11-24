@@ -154,6 +154,7 @@ def main():
 
     bpp_sum = 0.
     total_time = 0
+    error_out_images = []
     with open(os.path.join(opt.output_dir, 'bpp.txt'),'a') as f:
         for i, x in enumerate(tqdm(dataloader)):
             try:
@@ -175,6 +176,7 @@ def main():
                 end = time.time()
             except Exception as err:
                 print(err)
+                error_out_images.append(i)
             total_time += (end - start) - write_time
             bpp_sum += bpp
             f.write(f'image: {i} \t bpp: {bpp}\n')
@@ -183,6 +185,10 @@ def main():
     print("Total inference time: ", end - start)
     print("Average inference time: ", (end - start) / len(dataset))
     f.close()
+    with open("error_images.txt", "w") as file:
+        for item in error_out_images:
+            file.write(item + "\n")
+
 
 
 if __name__ == '__main__':
