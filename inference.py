@@ -187,7 +187,7 @@ def main():
     f.close()
     with open("error_images.txt", "w") as file:
         for item in error_out_images:
-            file.write(item + "\n")
+            file.write(str(item) + "\n")
 
 
 
