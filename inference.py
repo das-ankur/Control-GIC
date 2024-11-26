@@ -155,6 +155,7 @@ def main():
     bpp_sum = 0.
     total_time = 0
     error_out_images = []
+    valid_count = 0
     with open(os.path.join(opt.output_dir, 'bpp.txt'),'a') as f:
         for i, x in enumerate(tqdm(dataloader)):
             try:
@@ -174,16 +175,17 @@ def main():
                     else:
                         bpp = model.compress(x, opt.output_dir, h_string, h_mask, save_img=False)
                 end = time.time()
+                total_time += (end - start) - write_time
+                bpp_sum += bpp
+                valid_count += 1
+                f.write(f'image: {i} \t bpp: {bpp}\n')
             except Exception as err:
                 print(err)
                 error_out_images.append(i)
-            total_time += (end - start) - write_time
-            bpp_sum += bpp
-            f.write(f'image: {i} \t bpp: {bpp}\n')
-        f.write(f'Bpp Average: {bpp_sum/len(dataset)}')
-        print(f'Bpp Average: {bpp_sum/len(dataset)}')
+        f.write(f'Bpp Average: {bpp_sum/valid_count}')
+        print(f'Bpp Average: {bpp_sum/valid_count}')
     print("Total inference time: ", end - start)
-    print("Average inference time: ", (end - start) / len(dataset))
+    print("Average inference time: ", (end - start) / valid_count)
     f.close()
     with open("error_images.txt", "w") as file:
         for item in error_out_images:
