@@ -20,7 +20,7 @@ def calculate_psnr(original_path, compressed_path):
     try:
         mse = np.mean((original - compressed) ** 2)
     except Exception:
-        ms = np.mean((cv2.resize(original, compressed.shape[:2])))
+        mse = np.mean((cv2.resize(original, compressed.shape[:2])))
     if mse == 0:  # No difference
         return 100
     max_pixel = 255.0
