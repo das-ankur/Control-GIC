@@ -20,7 +20,7 @@ def calculate_psnr(original_path, compressed_path):
     try:
         mse = np.mean((original - compressed) ** 2)
     except Exception:
-        mse = np.mean((cv2.resize(original, compressed.shape[:2])))
+        mse = np.mean((original - cv2.resize(original, compressed.shape[:2])) ** 2)
     if mse == 0:  # No difference
         return 100
     max_pixel = 255.0
@@ -34,8 +34,10 @@ def calculate_ssim(original_path, compressed_path):
     # Set win_size to be the minimum of image dimensions (height, width) or 7, and set channel_axis for color images
     min_dim = min(original.shape[:2])  # Get the smaller dimension of the image
     win_size = min(min_dim, 7)  # Ensure win_size is not larger than the smallest dimension
-    
-    ssim_index, _ = ssim(original, compressed, full=True, multichannel=True, win_size=win_size, channel_axis=-1)
+    try:
+        ssim_index, _ = ssim(original, compressed, full=True, multichannel=True, win_size=win_size, channel_axis=-1)
+    except Exception:
+        ssim_index, _ = ssim(cv2.resize(original, compressed.shape[:2]), compressed, full=True, multichannel=True, win_size=win_size, channel_axis=-1)
     return ssim_index
 
 # Simulate Multiscale SSIM (MS-SSIM)
