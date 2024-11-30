@@ -20,7 +20,9 @@ def calculate_psnr(original_path, compressed_path):
     try:
         mse = np.mean((original - compressed) ** 2)
     except Exception:
-        mse = np.mean((cv2.resize(original, compressed.shape[:2]) - compressed) ** 2)
+        target_height, target_width = compressed.shape[:2]
+        original = cv2.resize(original, (target_width, target_height), interpolation=cv2.INTER_AREA)
+        mse = np.mean((original - compressed) ** 2)
     if mse == 0:  # No difference
         return 100
     max_pixel = 255.0
@@ -37,7 +39,9 @@ def calculate_ssim(original_path, compressed_path):
     try:
         ssim_index, _ = ssim(original, compressed, full=True, multichannel=True, win_size=win_size, channel_axis=-1)
     except Exception:
-        ssim_index, _ = ssim(cv2.resize(original, compressed.shape[:2]), compressed, full=True, multichannel=True, win_size=win_size, channel_axis=-1)
+        target_height, target_width = compressed.shape[:2]
+        original = cv2.resize(original, (target_width, target_height), interpolation=cv2.INTER_AREA)
+        ssim_index, _ = ssim(original, compressed, full=True, multichannel=True, win_size=win_size, channel_axis=-1)
     return ssim_index
 
 # Simulate Multiscale SSIM (MS-SSIM)
@@ -50,6 +54,9 @@ def calculate_ms_ssim(original_path, compressed_path):
         return ssim_index
     original = load_image(original_path)
     compressed = load_image(compressed_path)
+    if original.shape != compressed.shape:
+        target_height, target_width = compressed.shape[:2]
+        original = cv2.resize(original, (target_width, target_height), interpolation=cv2.INTER_AREA)
     # Downscale images and compute SSIM at different scales
     scales = [1, 0.5, 0.25]  # Different scales (original, half, quarter resolution)
     ms_ssim_value = 0
